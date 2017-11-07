@@ -1,5 +1,5 @@
 {
-  "name": "weixin-jssdk",
+  "name": "weixinjssdk",
   "version": "0.0.1",
   "description": "weixin-jssdk for node.js",
   "main": "src/index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cycdpo/weixin-jssdk.git"
+    "url": "git+https://github.com/cycdpo/weixinjssdk.git"
   },
   "keywords": [
     "weixin",
@@ -20,9 +20,9 @@
   "author": "cycjimmy <cycjimmy@gmail.com> (https://github.com/cycjimmy)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cycdpo/weixin-jssdk/issues"
+    "url": "https://github.com/cycdpo/weixinjssdk/issues"
   },
-  "homepage": "https://github.com/cycdpo/weixin-jssdk#readme",
+  "homepage": "https://github.com/cycdpo/weixinjssdk#readme",
   "dependencies": {
     "node-cache": "^4.1.1",
     "superagent": "^3.8.0"
