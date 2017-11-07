@@ -1,0 +1,38 @@
+{
+  "name": "weixin-jssdk",
+  "version": "0.0.1",
+  "description": "weixin-jssdk for node.js",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=development node ./express/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cycdpo/weixin-jssdk.git"
+  },
+  "keywords": [
+    "weixin",
+    "wechat",
+    "node",
+    "jssdk"
+  ],
+  "author": "cycjimmy <cycjimmy@gmail.com> (https://github.com/cycjimmy)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cycdpo/weixin-jssdk/issues"
+  },
+  "homepage": "https://github.com/cycdpo/weixin-jssdk#readme",
+  "dependencies": {
+    "node-cache": "^4.1.1",
+    "superagent": "^3.8.0"
+  },
+  "devDependencies": {
+    "cross-env": "^5.1.1",
+    "express": "^4.16.2",
+    "jest": "^21.2.1"
+  },
+  "engines": {
+    "node": ">=6"
+  }
+}
