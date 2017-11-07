@@ -5,14 +5,7 @@ const
 let
   app = express()
   , wxjssdk = require('../src')
-  , port = process.env.PORT
 ;
-
-// dev mode
-if (process.env.NODE_ENV === 'development') {
-  port = 3000;
-
-}
 
 // static
 app.use('/static', express.static('static'));
@@ -35,6 +28,4 @@ app.get('/api/wxJssdk', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-  console.log('App is listening at port ' + port + '!');
-});
+app.listen(process.env.PORT || 3000);
