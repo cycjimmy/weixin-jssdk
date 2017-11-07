@@ -1,14 +1,16 @@
 const
   express = require('express')
+  , path = require('path')
 ;
 
 let
   app = express()
   , wxjssdk = require('../src')
+  , port = process.env.PORT || 3000
 ;
 
 // static
-app.use('/static', express.static('static'));
+app.use('/static', express.static(path.resolve('static')));
 
 // set api
 app.get('/api/wxJssdk', (req, res) => {
@@ -28,4 +30,7 @@ app.get('/api/wxJssdk', (req, res) => {
     });
 });
 
-app.listen(process.env.PORT || 3000);
+app.listen(port, () => {
+  console.log('App is listening at port ' + port + '!');
+});
+
