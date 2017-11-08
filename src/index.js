@@ -37,6 +37,8 @@ module.exports = ({
         ret = sign(api_ticket, url)
       ;
 
+      console.log(ret);
+
       setTimeout(() => resolve({
         appId: appid,
         timestamp: ret.timestamp,

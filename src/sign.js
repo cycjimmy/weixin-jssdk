@@ -52,8 +52,6 @@ module.exports = (jsapi_ticket, url) => {
     string = raw(ret)
   ;
   ret.signature = sha1(string);
-  console.log(ret.signature);
-
   return ret;
 };
 
