@@ -1,6 +1,13 @@
 const
   NodeCache = require('node-cache')
-  , sign = require('./sign')
+  , {
+    getSignature,
+    ticketSign,
+  } = require('./sign')
+  , handleServerVerify = require('./handleServerVerify')
+  , {
+    getUrl
+  } = require('./tools')
 ;
 
 let
@@ -19,32 +26,39 @@ let
     },
     grant_type: 'client_credential',
   }
+
+  , wxjssdk = ({
+                 url,
+                 appid,
+                 secret
+               }) => {
+
+    config.appid = appid;
+    config.secret = secret;
+
+    return getAccessToken({config, cache})                                // get access_token
+      .then(access_token => getApiTicket({config, cache, access_token}))  // get api_ticket
+      .then(api_ticket => new Promise(resolve => {
+        let
+          ret = ticketSign(api_ticket, url)
+        ;
+
+        console.log(ret);
+
+        setTimeout(() => resolve({
+          appId: appid,
+          timestamp: ret.timestamp,
+          nonceStr: ret.nonceStr,
+          signature: ret.signature,
+        }), 0);
+      }));
+  }
 ;
 
-module.exports = ({
-                    url,
-                    appid,
-                    secret
-                  }) => {
+// add static function
+wxjssdk.getUrl = getUrl;
+wxjssdk.getSignature = getSignature;
+wxjssdk.handleServerVerify = handleServerVerify;
 
-  config.appid = appid;
-  config.secret = secret;
-
-  return getAccessToken({config, cache})                                // get access_token
-    .then(access_token => getApiTicket({config, cache, access_token}))  // get api_ticket
-    .then(api_ticket => new Promise(resolve => {
-      let
-        ret = sign(api_ticket, url)
-      ;
-
-      console.log(ret);
-
-      setTimeout(() => resolve({
-        appId: appid,
-        timestamp: ret.timestamp,
-        nonceStr: ret.nonceStr,
-        signature: ret.signature,
-      }), 0);
-    }));
-};
+module.exports = wxjssdk;
 

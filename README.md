@@ -46,3 +46,23 @@ wxjssdk(params).then(data => {
   // ...
 });
 ```
+
+## More
+* `wxjssdk.getSignature`: [Function] Get signature. Param: `obj`.
+* `wxjssdk.getUrl`: [Function] Return the URL that meets the official requirements. Param: `request`.
+* `wxjssdk.handleServerVerify`: [Function] Handle Server Verify. Param: `req, res, next`. Demo:
+  ```javascript
+  // via express
+  const
+    express = require('express')
+  ;
+
+  let
+    app = express()
+    , wxjssdk = require('weixinjssdk')
+  ;
+
+  // wxVerify
+  app.get('/api/wxVerify', wxjssdk.handleServerVerify);
+  app.post('/api/wxVerify', wxjssdk.handleServerVerify);
+  ```
