@@ -62,7 +62,11 @@ wxjssdk(params).then(data => {
     , wxjssdk = require('weixinjssdk')
   ;
 
+  const
+    token = 'yourtoken'
+  ;
+
   // wxVerify
-  app.get('/api/wxVerify', wxjssdk.handleServerVerify);
-  app.post('/api/wxVerify', wxjssdk.handleServerVerify);
+  app.get('/api/wxVerify', wxjssdk.handleServerVerify(token));
+  app.post('/api/wxVerify', wxjssdk.handleServerVerify(token));
   ```

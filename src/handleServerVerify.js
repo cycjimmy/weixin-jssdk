@@ -4,8 +4,11 @@ const
   } = require('./sign')
 ;
 
-
-module.exports = (req, res, next) => {
+/**
+ * handleServerVerify
+ * @param token
+ */
+module.exports = token => (req, res, next) => {
   let
     {signature, timestamp, nonce, echostr} = req.query
   ;
