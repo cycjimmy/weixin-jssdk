@@ -1,7 +1,7 @@
 const
   {
-    getSignature
-  } = require('./sign')
+    sha1
+  } = require('./tools')
 ;
 
 /**
@@ -28,7 +28,9 @@ module.exports = token => (req, res, next) => {
     }
   }
 
-  let sign = getSignature({token, timestamp, nonce});
+  let params = [token, timestamp, nonce];
+  params.sort();
+  let sign = sha1(params.join(''));
 
   if (signature !== sign) {
     res.send('invaid sign');
