@@ -1,7 +1,7 @@
 const
   express = require('express')
   , app = express()
-  , WxJssdk = require('../src')
+  , WxJssdk = require('../dist')
 
   , port = process.env.PORT || 3000
 ;

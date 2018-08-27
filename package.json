@@ -1,12 +1,13 @@
 {
   "name": "weixinjssdk",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "weixin-jssdk for node.js",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
     "start": "nodemon server/index.js",
-    "build": "trash dist && babel src -d dist"
+    "build": "trash dist && babel src -d dist",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
