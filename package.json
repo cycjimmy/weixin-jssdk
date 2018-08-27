@@ -1,6 +1,6 @@
 {
   "name": "weixinjssdk",
-  "version": "0.0.5",
+  "version": "1.0.0-beta.1",
   "description": "weixin-jssdk for node.js",
   "main": "src/index.js",
   "scripts": {

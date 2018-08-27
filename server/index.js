@@ -1,9 +1,6 @@
 const
   express = require('express')
-;
-
-let
-  app = express()
+  , app = express()
   , wxjssdk = require('../src')
   , port = process.env.PORT || 3000
 ;
@@ -14,11 +11,15 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/api/wxJssdk', (req, res) => {
-  wxjssdk({
-    appid: 'wxcc6445076f2002c3',
-    secret: 'd4624c36b6795d1d99dcf0547af5443d',
-    url: wxjssdk.getUrl(req)
-  })
+  wxjssdk({})
+    .setWxConfig({
+      appid: 'wxcc6445076f2002c3',
+      secret: 'd4624c36b6795d1d99dcf0547af5443d',
+    })
+    .setHook()
+    .wxshare({
+      url: wxjssdk.tools.getUrl(req)
+    })
     .then(data => {
       res.send(data);
     }, (err) => {

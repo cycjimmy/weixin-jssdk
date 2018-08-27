@@ -19,16 +19,18 @@ let
     });
 
     for (let k in newArgs) {
-      string += '&' + k + '=' + newArgs[k];
+      if (newArgs.hasOwnProperty(k)) {
+        string += '&' + k + '=' + newArgs[k];
+      }
     }
     string = string.substr(1);
     return string;
   }
 
   , sha1 = (str) => {
-    let shasum = crypto.createHash("sha1");
+    let shasum = crypto.createHash('sha1');
     shasum.update(str);
-    str = shasum.digest("hex");
+    str = shasum.digest('hex');
     return str;
   }
 
