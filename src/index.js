@@ -1,6 +1,6 @@
 const NodeCache = require('node-cache');
 
-class WxJssdk {
+module.exports =class WxJssdk {
   constructor() {
     this.wxConfig = {};
 
@@ -192,7 +192,5 @@ class WxJssdk {
         url
       }));
   };
-}
-
-module.exports = new WxJssdk();
+};
 
