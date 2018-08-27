@@ -20,7 +20,7 @@ let wxJssdk = new WxJssdk()
 
 app.get('/api/wxJssdk', (req, res) => {
   wxJssdk.wxshare({
-    url: wxjssdk.tools.getUrl(req)
+    url: wxJssdk.tools.getUrl(req)
   })
     .then(data => {
       res.send(data);
