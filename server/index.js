@@ -1,10 +1,8 @@
 const
   express = require('express')
-;
+  , app = express()
+  , WxJssdk = require('../dist')
 
-let
-  app = express()
-  , wxjssdk = require('../src')
   , port = process.env.PORT || 3000
 ;
 
@@ -13,13 +11,19 @@ app.get('/api', (req, res) => {
   res.send('mock api');
 });
 
+let wxJssdk = new WxJssdk()
+  .setWxConfig({
+    appid: 'wxb36bf3640a94c61d',
+    secret: '3a5e7056cc718ebdf72b41a5e2a88d3e',
+  })
+  .setHook();
+
 app.get('/api/wxJssdk', (req, res) => {
-  wxjssdk({
-    appid: 'wxcc6445076f2002c3',
-    secret: 'd4624c36b6795d1d99dcf0547af5443d',
-    url: wxjssdk.getUrl(req)
+  wxJssdk.wxshare({
+    url: wxJssdk.tools.getUrl(req)
   })
     .then(data => {
+      console.log(data);
       res.send(data);
     }, (err) => {
       res.send(err);

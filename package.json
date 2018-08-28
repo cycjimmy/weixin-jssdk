@@ -1,11 +1,13 @@
 {
   "name": "weixinjssdk",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "weixin-jssdk for node.js",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "jest",
-    "start": "nodemon server/index.js"
+    "start": "nodemon server/index.js",
+    "build": "trash dist && babel src -d dist",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -24,15 +26,16 @@
   },
   "homepage": "https://github.com/cycdpo/weixinjssdk#readme",
   "dependencies": {
-    "node-cache": "^4.1.1",
-    "superagent": "^3.8.0"
+    "node-cache": "^4.2.0",
+    "superagent": "^3.8.3"
   },
   "devDependencies": {
-    "express": "^4.16.2",
-    "jest": "^21.2.1",
-    "nodemon": "^1.12.1"
-  },
-  "engines": {
-    "node": ">=6"
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "express": "^4.16.3",
+    "jest": "^23.5.0",
+    "nodemon": "^1.18.3",
+    "trash-cli": "^1.4.0"
   }
 }
