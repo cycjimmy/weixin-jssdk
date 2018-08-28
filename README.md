@@ -4,7 +4,6 @@
 [![build status][travis-image]][travis-url]
 [![David deps][david-image]][david-url]
 [![devDependencies Status][david-dev-image]][david-dev-url]
-[![node version][node-image]][node-url]
 [![npm download][download-image]][download-url]
 [![npm license][license-image]][download-url]
 
@@ -16,8 +15,6 @@
 [david-url]: https://david-dm.org/cycdpo/weixinjssdk
 [david-dev-image]: https://david-dm.org/cycdpo/weixinjssdk/dev-status.svg?style=flat-square
 [david-dev-url]: https://david-dm.org/cycdpo/weixinjssdk?type=dev
-[node-image]: https://img.shields.io/badge/node.js-%3E=_6.0-green.svg?style=flat-square
-[node-url]: http://nodejs.org/download/
 [download-image]: https://img.shields.io/npm/dm/weixinjssdk.svg?style=flat-square
 [download-url]: https://npmjs.org/package/weixinjssdk
 [license-image]: https://img.shields.io/npm/l/weixinjssdk.svg?style=flat-square
@@ -33,40 +30,29 @@ $ yarn add weixinjssdk
 
 ## Use
 ```javascript
-let wxjssdk = require('weixinjssdk');
+const WxJssdk = require('weixinjssdk');
 
-let params = {
-  appid: 'your appid',
-  secret: 'your secret',
-  url: 'whole url'
-};
+let wxJssdk = new WxJssdk()
+  .setWxConfig({
+    appid: 'your appid',
+    secret: 'your secret',
+  })
+  [.setHook({
+    getAccessTokenSuccess: new Promise...,
+    getAccessTokenFromCustom: new Promise...,
+  })];
 
-wxjssdk(params).then(data => {
+wxJssdk.wxshare({
+   url: 'whole url'
+})
+.then(data => {
   // Do something
   // ...
 });
 ```
 
 ## More
-* `wxjssdk.getSignature`: [Function] Get signature. Param: `obj`.
-* `wxjssdk.getUrl`: [Function] Return the URL that meets the official requirements. Param: `request`.
-* `wxjssdk.handleServerVerify`: [Function] Handle Server Verify. Param: `req, res, next`. Demo:
-  ```javascript
-  // via express
-  const
-    express = require('express')
-  ;
+* `wxJssdk.setHook`: [Object] Set Hook Functions.
+  * `getAccessTokenSuccess`: [Promise] Run Hook when get Access_Token success. Please resolve Access_Token.
+  * `getAccessTokenFromCustom`: [Promise] Run custom task Before get Access_Token from wechat. Please resolve Access_Token.
 
-  let
-    app = express()
-    , wxjssdk = require('weixinjssdk')
-  ;
-
-  const
-    token = 'yourtoken'
-  ;
-
-  // wxVerify
-  app.get('/api/wxVerify', wxjssdk.handleServerVerify(token));
-  app.post('/api/wxVerify', wxjssdk.handleServerVerify(token));
-  ```

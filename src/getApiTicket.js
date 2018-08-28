@@ -5,20 +5,21 @@ const
 module.exports = ({
                     config,
                     access_token,
-                  }) => new Promise((resolve, reject) => {
+                  }) => new Promise(resolve => {
   superagent
     .get(config.url.ticket)
     .query({
       type: 'jsapi',
       access_token: access_token,
     })
-    .accept('application/json')
+    .set('accept', 'json')
     .end((err, s_res) => {
       if (err) {
-        reject(err);
+        resolve();
+      } else {
+        const ticket = JSON.parse(s_res.text).ticket;
+        ticket ? resolve(ticket) : resolve();
       }
-
-      resolve(JSON.parse(s_res.text).ticket);
     });
 });
 

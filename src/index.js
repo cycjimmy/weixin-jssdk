@@ -13,8 +13,8 @@ class WxJssdk {
     };
 
     this.hook = {
-      getAccessTokenSuccess: access_token => Promise.resolve(access_token),
       getAccessTokenFromCustom: () => Promise.resolve(''),
+      getAccessTokenSuccess: access_token => Promise.resolve(access_token),
     };
 
     this.cache = new NodeCache({
@@ -69,103 +69,121 @@ class WxJssdk {
   };
 
   /**
+   * setAccessTokenCache
+   * @param access_token
+   * @param TTL
+   * @return {Promise<any>}
+   */
+  setAccessTokenCache({
+                        access_token,
+                        TTL = 3600
+                      }) {
+    return new Promise(resolve => {
+      // cache access_token
+      this.cache.set('access_token', access_token, TTL, (err, success) => {
+        if (!err && success) {
+          console.log('access_token: Set access_token success [' + access_token + ']');
+          resolve(access_token);
+        }
+      });
+    })
+  };
+
+  /**
    * _getAccessToken: Task1
    * @private
    */
-  _getAccessToken({
-                    autoRunTask = false
-                  } = {}) {
-    return Promise.resolve()
-      .then(() => {
+  _getAccessToken() {
+    const
+      _getAccessTokenFromCache = () => new Promise(resolve => {
         this.cache.get('access_token', (err, value) => {
           if (!err && value !== undefined) {
             console.log('access_token: Has cache');
-            return Promise.resolve(value);
+            resolve(value);
+          } else {
+            console.log('access_token: No cache');
+            resolve();
           }
-
-          return this.hook.getAccessTokenFromCustom()
-            .then(access_token => {
-              if (access_token) {
-                return Promise.resolve(access_token);
-              }
-
-              // getAccessToken from wx
-              console.log('access_token: Start getAccessToken from wx');
-              return this.tools.getAccessToken({
-                config: this.config,
-                wxConfig: this.wxConfig,
-              })
-                .then(access_token => {
-                  // cache access_token
-                  this.cache.set('access_token', access_token, 3600, (err, success) => {
-                    if (!err && success) {
-                      console.log('access_token: Set access_token success');
-                      return this.hook.getAccessTokenSuccess(access_token);
-                    }
-                  });
-                });
-            });
         });
       })
+
+      , _getAccessTokenFromWX = () => this.tools.getAccessToken({
+        config: this.config,
+        wxConfig: this.wxConfig,
+      })
+        .then(access_token => this.setAccessTokenCache({access_token})
+          .then(access_token => this.hook.getAccessTokenSuccess(access_token)))
+
+      , _getAccessTokenMainTask = () => this.hook.getAccessTokenFromCustom()
+        .then(access_token => {
+          if (access_token) {
+            return Promise.resolve(access_token);
+          }
+
+          return _getAccessTokenFromWX();
+        })
+    ;
+
+    return _getAccessTokenFromCache()
       .then(access_token => {
         if (!access_token) {
-          return Promise.reject(new Error('Get access_token fail'));
-        }
-
-        console.log('access_token: GetAccessToken ' + access_token);
-        if (autoRunTask) {
-          return this._getApiTicket({
-            access_token,
-            autoRunTask: true,
-          })
+          return _getAccessTokenMainTask();
         }
 
         return Promise.resolve(access_token);
       });
   };
 
-
   /**
    * _getApiTicket: Task2
    * @param access_token
-   * @param autoRunTask
    * @return {*}
    * @private
    */
   _getApiTicket({
                   access_token = '',
                 } = {}) {
-    // getApiTicket from wx
-    if (access_token !== undefined) {
-      return this.tools.getApiTicket({
+
+    const
+      _getApiTicketFromCache = () => new Promise(resolve => {
+        this.cache.get('api_ticket', (err, value) => {
+          if (!err && value !== undefined) {
+            console.log('api_ticket: Has cache');
+            resolve(value);
+          } else {
+            console.log('api_ticket: No cache');
+            resolve();
+          }
+        });
+      })
+      , _getApiTicketFromWX = () => this.tools.getApiTicket({
         config: this.config,
         access_token
       })
-        .then(api_ticket => new Promise((resolve, reject) => {
+        .then(api_ticket => new Promise(resolve => {
           // cache api_ticket
           this.cache.set('api_ticket', api_ticket, (err, success) => {
             if (!err && success) {
-              console.log('api_ticket: Get api_ticket success');
+              console.log('api_ticket: Set success [' + api_ticket + ']');
               resolve(api_ticket);
-            } else {
-              reject(err);
             }
           });
-        }));
+        }))
+    ;
+
+    if (!access_token) {
+      return Promise.resolve()
     }
 
-    // getApiTicket from cache
-    this.cache.get('api_ticket', (err, value) => {
-      if (!err && value !== undefined) {
-        console.log('api_ticket: Has cache');
-        return Promise.resolve(value);
-      }
+    return _getApiTicketFromCache()
+      .then(api_ticket => {
+        if (!api_ticket) {
+          return _getApiTicketFromWX();
+        }
 
-      console.log('api_ticket: need get accessToken');
-      return this._getAccessToken({autoRunTask: true});
-    });
+        return Promise.resolve(api_ticket);
+      });
   };
-
 
   /**
    * Final Sign: Task3
@@ -178,6 +196,8 @@ class WxJssdk {
                api_ticket,
                url
              }) {
+
+    console.log('finalSign: [' + api_ticket + '] [' + url + ']');
     return new Promise(resolve => {
       const ret = this.tools.ticketSign(api_ticket, url);
       setTimeout(() => resolve({
@@ -197,12 +217,13 @@ class WxJssdk {
   wxshare({
             url
           }) {
-    return this._getApiTicket()
+
+    return this._getAccessToken()
+      .then(access_token => this._getApiTicket({access_token}))
       .then(api_ticket => this._finalSign({
         api_ticket,
         url
-      }))
-      .catch(err => Promise.reject(err));
+      }));
   };
 }
 

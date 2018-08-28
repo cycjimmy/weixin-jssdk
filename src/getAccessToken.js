@@ -1,11 +1,9 @@
-const
-  superagent = require('superagent')
-;
+const superagent = require('superagent');
 
 module.exports = ({
                     config,
                     wxConfig
-                  }) => new Promise((resolve, reject) => {
+                  }) => new Promise(resolve => {
   superagent
     .get(config.url.token)
     .query({
@@ -13,12 +11,14 @@ module.exports = ({
       appid: wxConfig.appid,
       secret: wxConfig.secret
     })
-    .accept('application/json')
+    .set('accept', 'json')
     .end((err, s_res) => {
       if (err) {
-        reject(err);
-      }
+        resolve();
+      } else {
+        const access_token = JSON.parse(s_res.text).access_token;
 
-      resolve(JSON.parse(s_res.text).access_token);
+        access_token ? resolve(access_token): resolve();
+      }
     });
 });

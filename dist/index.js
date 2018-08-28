@@ -25,11 +25,11 @@ var WxJssdk = function () {
     };
 
     this.hook = {
-      getAccessTokenSuccess: function getAccessTokenSuccess(access_token) {
-        return Promise.resolve(access_token);
-      },
       getAccessTokenFromCustom: function getAccessTokenFromCustom() {
         return Promise.resolve('');
+      },
+      getAccessTokenSuccess: function getAccessTokenSuccess(access_token) {
+        return Promise.resolve(access_token);
       }
     };
 
@@ -92,6 +92,33 @@ var WxJssdk = function () {
       return this;
     }
   }, {
+    key: 'setAccessTokenCache',
+
+
+    /**
+     * setAccessTokenCache
+     * @param access_token
+     * @param TTL
+     * @return {Promise<any>}
+     */
+    value: function setAccessTokenCache(_ref3) {
+      var _this = this;
+
+      var access_token = _ref3.access_token,
+          _ref3$TTL = _ref3.TTL,
+          TTL = _ref3$TTL === undefined ? 3600 : _ref3$TTL;
+
+      return new Promise(function (resolve) {
+        // cache access_token
+        _this.cache.set('access_token', access_token, TTL, function (err, success) {
+          if (!err && success) {
+            console.log('access_token: Set access_token success [' + access_token + ']');
+            resolve(access_token);
+          }
+        });
+      });
+    }
+  }, {
     key: '_getAccessToken',
 
 
@@ -100,51 +127,44 @@ var WxJssdk = function () {
      * @private
      */
     value: function _getAccessToken() {
-      var _this = this;
+      var _this2 = this;
 
-      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-          _ref3$autoRunTask = _ref3.autoRunTask,
-          autoRunTask = _ref3$autoRunTask === undefined ? false : _ref3$autoRunTask;
-
-      return Promise.resolve().then(function () {
-        _this.cache.get('access_token', function (err, value) {
-          if (!err && value !== undefined) {
-            console.log('access_token: Has cache');
-            return Promise.resolve(value);
-          }
-
-          return _this.hook.getAccessTokenFromCustom().then(function (access_token) {
-            if (access_token) {
-              return Promise.resolve(access_token);
+      var _getAccessTokenFromCache = function _getAccessTokenFromCache() {
+        return new Promise(function (resolve) {
+          _this2.cache.get('access_token', function (err, value) {
+            if (!err && value !== undefined) {
+              console.log('access_token: Has cache');
+              resolve(value);
+            } else {
+              console.log('access_token: No cache');
+              resolve();
             }
-
-            // getAccessToken from wx
-            console.log('access_token: Start getAccessToken from wx');
-            return _this.tools.getAccessToken({
-              config: _this.config,
-              wxConfig: _this.wxConfig
-            }).then(function (access_token) {
-              // cache access_token
-              _this.cache.set('access_token', access_token, 3600, function (err, success) {
-                if (!err && success) {
-                  console.log('access_token: Set access_token success');
-                  return _this.hook.getAccessTokenSuccess(access_token);
-                }
-              });
-            });
           });
         });
-      }).then(function (access_token) {
-        if (!access_token) {
-          return Promise.reject(new Error('Get access_token fail'));
-        }
-
-        console.log('access_token: GetAccessToken ' + access_token);
-        if (autoRunTask) {
-          return _this._getApiTicket({
-            access_token: access_token,
-            autoRunTask: true
+      },
+          _getAccessTokenFromWX = function _getAccessTokenFromWX() {
+        return _this2.tools.getAccessToken({
+          config: _this2.config,
+          wxConfig: _this2.wxConfig
+        }).then(function (access_token) {
+          return _this2.setAccessTokenCache({ access_token: access_token }).then(function (access_token) {
+            return _this2.hook.getAccessTokenSuccess(access_token);
           });
+        });
+      },
+          _getAccessTokenMainTask = function _getAccessTokenMainTask() {
+        return _this2.hook.getAccessTokenFromCustom().then(function (access_token) {
+          if (access_token) {
+            return Promise.resolve(access_token);
+          }
+
+          return _getAccessTokenFromWX();
+        });
+      };
+
+      return _getAccessTokenFromCache().then(function (access_token) {
+        if (!access_token) {
+          return _getAccessTokenMainTask();
         }
 
         return Promise.resolve(access_token);
@@ -157,46 +177,56 @@ var WxJssdk = function () {
     /**
      * _getApiTicket: Task2
      * @param access_token
-     * @param autoRunTask
      * @return {*}
      * @private
      */
     value: function _getApiTicket() {
-      var _this2 = this;
+      var _this3 = this;
 
       var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
           _ref4$access_token = _ref4.access_token,
           access_token = _ref4$access_token === undefined ? '' : _ref4$access_token;
 
-      // getApiTicket from wx
-      if (access_token !== undefined) {
-        return this.tools.getApiTicket({
-          config: this.config,
+      var _getApiTicketFromCache = function _getApiTicketFromCache() {
+        return new Promise(function (resolve) {
+          _this3.cache.get('api_ticket', function (err, value) {
+            if (!err && value !== undefined) {
+              console.log('api_ticket: Has cache');
+              resolve(value);
+            } else {
+              console.log('api_ticket: No cache');
+              resolve();
+            }
+          });
+        });
+      },
+          _getApiTicketFromWX = function _getApiTicketFromWX() {
+        return _this3.tools.getApiTicket({
+          config: _this3.config,
           access_token: access_token
         }).then(function (api_ticket) {
-          return new Promise(function (resolve, reject) {
+          return new Promise(function (resolve) {
             // cache api_ticket
-            _this2.cache.set('api_ticket', api_ticket, function (err, success) {
+            _this3.cache.set('api_ticket', api_ticket, function (err, success) {
               if (!err && success) {
-                console.log('api_ticket: Get api_ticket success');
+                console.log('api_ticket: Set success [' + api_ticket + ']');
                 resolve(api_ticket);
-              } else {
-                reject(err);
               }
             });
           });
         });
+      };
+
+      if (!access_token) {
+        return Promise.resolve();
       }
 
-      // getApiTicket from cache
-      this.cache.get('api_ticket', function (err, value) {
-        if (!err && value !== undefined) {
-          console.log('api_ticket: Has cache');
-          return Promise.resolve(value);
+      return _getApiTicketFromCache().then(function (api_ticket) {
+        if (!api_ticket) {
+          return _getApiTicketFromWX();
         }
 
-        console.log('api_ticket: need get accessToken');
-        return _this2._getAccessToken({ autoRunTask: true });
+        return Promise.resolve(api_ticket);
       });
     }
   }, {
@@ -211,16 +241,18 @@ var WxJssdk = function () {
      * @private
      */
     value: function _finalSign(_ref5) {
-      var _this3 = this;
+      var _this4 = this;
 
       var api_ticket = _ref5.api_ticket,
           url = _ref5.url;
 
+
+      console.log('finalSign: [' + api_ticket + '] [' + url + ']');
       return new Promise(function (resolve) {
-        var ret = _this3.tools.ticketSign(api_ticket, url);
+        var ret = _this4.tools.ticketSign(api_ticket, url);
         setTimeout(function () {
           return resolve({
-            appId: _this3.wxConfig.appid,
+            appId: _this4.wxConfig.appid,
             timestamp: ret.timestamp,
             nonceStr: ret.nonceStr,
             signature: ret.signature
@@ -238,17 +270,18 @@ var WxJssdk = function () {
      * @return {Request|PromiseLike<any>|Promise<any>}
      */
     value: function wxshare(_ref6) {
-      var _this4 = this;
+      var _this5 = this;
 
       var url = _ref6.url;
 
-      return this._getApiTicket().then(function (api_ticket) {
-        return _this4._finalSign({
+
+      return this._getAccessToken().then(function (access_token) {
+        return _this5._getApiTicket({ access_token: access_token });
+      }).then(function (api_ticket) {
+        return _this5._finalSign({
           api_ticket: api_ticket,
           url: url
         });
-      }).catch(function (err) {
-        return Promise.reject(err);
       });
     }
   }]);
