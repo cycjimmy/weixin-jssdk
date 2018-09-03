@@ -111,8 +111,15 @@ class WxJssdk {
         config: this.config,
         wxConfig: this.wxConfig,
       })
-        .then(access_token => this.setAccessTokenCache({access_token})
-          .then(access_token => this.hook.getAccessTokenSuccess(access_token)))
+        .then(access_token => {
+          if (!access_token) {
+            console.error('access_token: getAccessTokenFromWX fail!');
+            return Promise.resolve();
+          }
+
+          return this.setAccessTokenCache({access_token})
+            .then(access_token => this.hook.getAccessTokenSuccess(access_token));
+        })
 
       , _getAccessTokenMainTask = () => this.hook.getAccessTokenFromCustom()
         .then(access_token => {
@@ -161,13 +168,18 @@ class WxJssdk {
         access_token
       })
         .then(api_ticket => new Promise(resolve => {
-          // cache api_ticket
-          this.cache.set('api_ticket', api_ticket, (err, success) => {
-            if (!err && success) {
-              console.log('api_ticket: Set success [' + api_ticket + ']');
-              resolve(api_ticket);
-            }
-          });
+          if (api_ticket) {
+            // cache api_ticket
+            this.cache.set('api_ticket', api_ticket, (err, success) => {
+              if (!err && success) {
+                console.log('api_ticket: Set success [' + api_ticket + ']');
+                resolve(api_ticket);
+              }
+            });
+          } else {
+            console.error('api_ticket: getApiTicketFromWX fail!');
+            resolve();
+          }
         }))
     ;
 
