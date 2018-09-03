@@ -147,6 +147,11 @@ var WxJssdk = function () {
           config: _this2.config,
           wxConfig: _this2.wxConfig
         }).then(function (access_token) {
+          if (!access_token) {
+            console.error('access_token: getAccessTokenFromWX fail!');
+            return Promise.resolve();
+          }
+
           return _this2.setAccessTokenCache({ access_token: access_token }).then(function (access_token) {
             return _this2.hook.getAccessTokenSuccess(access_token);
           });
@@ -206,13 +211,18 @@ var WxJssdk = function () {
           access_token: access_token
         }).then(function (api_ticket) {
           return new Promise(function (resolve) {
-            // cache api_ticket
-            _this3.cache.set('api_ticket', api_ticket, function (err, success) {
-              if (!err && success) {
-                console.log('api_ticket: Set success [' + api_ticket + ']');
-                resolve(api_ticket);
-              }
-            });
+            if (api_ticket) {
+              // cache api_ticket
+              _this3.cache.set('api_ticket', api_ticket, function (err, success) {
+                if (!err && success) {
+                  console.log('api_ticket: Set success [' + api_ticket + ']');
+                  resolve(api_ticket);
+                }
+              });
+            } else {
+              console.error('api_ticket: getApiTicketFromWX fail!');
+              resolve();
+            }
           });
         });
       };
