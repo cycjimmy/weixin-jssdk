@@ -1,16 +1,16 @@
-'use strict';
+"use strict";
 
-var _require = require('./tools'),
-    createNonceStr = _require.createNonceStr,
-    createTimestamp = _require.createTimestamp,
-    raw = _require.raw,
-    sha1 = _require.sha1;
+const {
+  createNonceStr,
+  createTimestamp,
+  raw,
+  sha1
+} = require('./tools');
 
-var getSignature = function getSignature(obj) {
-  var str = raw(obj);
+let getSignature = obj => {
+  let str = raw(obj);
   return sha1(str);
 }
-
 /**
  * @param jsapi_ticket
  * @param url
@@ -18,18 +18,16 @@ var getSignature = function getSignature(obj) {
  * @returns
  */
 ,
-    ticketSign = function ticketSign(jsapi_ticket, url) {
-  var ret = {
+    ticketSign = (jsapi_ticket, url) => {
+  let ret = {
     jsapi_ticket: jsapi_ticket,
     nonceStr: createNonceStr(),
     timestamp: createTimestamp(),
     url: url
   };
-
   ret.signature = getSignature(ret);
   return ret;
 };
-
 /**
  *
  * @param jsapi_ticket
@@ -37,7 +35,9 @@ var getSignature = function getSignature(obj) {
  *
  * @returns
  */
+
+
 module.exports = {
-  getSignature: getSignature,
-  ticketSign: ticketSign
+  getSignature,
+  ticketSign
 };

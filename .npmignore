@@ -1,4 +1,16 @@
+# IDE
+.idea
+.editorconfig
+
+# doc
+.github
+
+# test
+test
+.travis.yml
+
 # project
 server
 src
+yarn.lock
 
