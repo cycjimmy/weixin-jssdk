@@ -4,21 +4,21 @@ let
 
 describe('spec', () => {
   test('is running?', () => {
-    let
+    const
       params = {
         appid: 'wxcc6445076f2002c3',
         secret: 'd4624c36b6795d1d99dcf0547af5443d',
         url: 'https://aaa.cc/bbb?d=1&e=2#fortest'
       };
 
-    let wxJssdk = new WxJssdk()
+    const wxJssdk = new WxJssdk()
       .setWxConfig({
-        appid: 'wxcc6445076f2002c3',
-        secret: 'd4624c36b6795d1d99dcf0547af5443d',
+        appid: params.appid,
+        secret: params.secret,
       })
       .setHook()
       .wxshare({
-        url: 'https://aaa.cc/bbb?d=1&e=2#fortest'
+        url: params.url,
       })
       .then(data => {
         expect(data.signature).toBeTruthy();

@@ -18,7 +18,7 @@ class WxJssdk {
     };
 
     this.cache = new NodeCache({
-      stdTTL: 3600,
+      stdTTL: 7200 - 600,          // 110min
     });
 
     this.tools = {
@@ -29,6 +29,8 @@ class WxJssdk {
       ticketSign: require('./sign').ticketSign,
       handleServerVerify: require('./handleServerVerify')
     };
+
+    this.cacheExpiredCB();
   };
 
   /**
@@ -54,8 +56,8 @@ class WxJssdk {
    * @return {WxJssdk}
    */
   setHook({
-            getAccessTokenSuccess,
-            getAccessTokenFromCustom
+            getAccessTokenSuccess = () => Promise.resolve(),
+            getAccessTokenFromCustom = () => Promise.resolve(),
           } = {}) {
     if (getAccessTokenSuccess) {
       this.hook.getAccessTokenSuccess = getAccessTokenSuccess;
@@ -66,6 +68,19 @@ class WxJssdk {
     }
 
     return this;
+  };
+
+  /**
+   * cacheExpiredCB
+   */
+  cacheExpiredCB() {
+    this.cache.on('expired', key => {
+      console.log('Cache Expired:' + key);
+      if (key === 'access_token') {
+        this._getAccessToken()
+          .then(access_token => this._getApiTicket({access_token}));
+      }
+    });
   };
 
   /**
@@ -86,7 +101,37 @@ class WxJssdk {
           resolve(access_token);
         }
       });
-    })
+    });
+  };
+
+  /**
+   * setApiTicketCache
+   * @param api_ticket
+   * @return {Promise<any>}
+   */
+  setApiTicketCache(api_ticket) {
+    return new Promise(resolve => {
+      this.cache.set('api_ticket', api_ticket, (err, success) => {
+        if (!err && success) {
+          console.log('api_ticket: Set success [' + api_ticket + ']');
+          resolve(api_ticket);
+        }
+      });
+    });
+  };
+
+  clearChche() {
+    return new Promise(resolve => {
+      this.cache.del([
+        'access_token',
+        'api_ticket',
+      ], (err, count) => {
+        if (!err) {
+          console.log('clearChche: ' + count);
+          resolve();
+        }
+      });
+    });
   };
 
   /**
@@ -113,31 +158,29 @@ class WxJssdk {
       })
         .then(access_token => {
           if (!access_token) {
-            console.error('access_token: getAccessTokenFromWX fail!');
-            return Promise.resolve();
+            const ERR_MSG = 'access_token: getAccessTokenFromWX fail!';
+            return Promise.reject(ERR_MSG);
           }
 
           return this.setAccessTokenCache({access_token})
             .then(access_token => this.hook.getAccessTokenSuccess(access_token));
         })
-
-      , _getAccessTokenMainTask = () => this.hook.getAccessTokenFromCustom()
-        .then(access_token => {
-          if (access_token) {
-            return Promise.resolve(access_token);
-          }
-
-          return _getAccessTokenFromWX();
-        })
     ;
 
     return _getAccessTokenFromCache()
       .then(access_token => {
-        if (!access_token) {
-          return _getAccessTokenMainTask();
+        if (access_token) {
+          return Promise.resolve(access_token);
         }
 
-        return Promise.resolve(access_token);
+        return this.hook.getAccessTokenFromCustom()
+          .then(access_token => {
+            if (access_token) {
+              return Promise.resolve(access_token);
+            }
+
+            return _getAccessTokenFromWX();
+          });
       });
   };
 
@@ -150,7 +193,6 @@ class WxJssdk {
   _getApiTicket({
                   access_token = '',
                 } = {}) {
-
     const
       _getApiTicketFromCache = () => new Promise(resolve => {
         this.cache.get('api_ticket', (err, value) => {
@@ -163,28 +205,24 @@ class WxJssdk {
           }
         });
       })
+
       , _getApiTicketFromWX = () => this.tools.getApiTicket({
         config: this.config,
         access_token
       })
-        .then(api_ticket => new Promise(resolve => {
-          if (api_ticket) {
-            // cache api_ticket
-            this.cache.set('api_ticket', api_ticket, (err, success) => {
-              if (!err && success) {
-                console.log('api_ticket: Set success [' + api_ticket + ']');
-                resolve(api_ticket);
-              }
-            });
-          } else {
-            console.error('api_ticket: getApiTicketFromWX fail!');
-            resolve();
+        .then(api_ticket => {
+          if (!api_ticket) {
+            const ERR_MSG = 'api_ticket: getApiTicketFromWX fail!';
+            return this.clearChche()
+              .then(() => Promise.reject(ERR_MSG));
           }
-        }))
+
+          return this.setApiTicketCache(api_ticket);
+        })
     ;
 
     if (!access_token) {
-      return Promise.resolve()
+      return Promise.reject('No access_token!');
     }
 
     return _getApiTicketFromCache()
@@ -224,10 +262,12 @@ class WxJssdk {
   /**
    * wxshare
    * @param url
+   * @param isRetry
    * @return {Request|PromiseLike<any>|Promise<any>}
    */
   wxshare({
-            url
+            url,
+            isRetry = false,
           }) {
 
     return this._getAccessToken()
@@ -235,7 +275,21 @@ class WxJssdk {
       .then(api_ticket => this._finalSign({
         api_ticket,
         url
-      }));
+      }))
+      .catch(e => {
+        console.error(e);
+
+        if (isRetry) {
+          const ERR_MSG = 'Retry Fail!';
+          console.log(ERR_MSG);
+          return Promise.reject(ERR_MSG);
+        }
+
+        return this.wxshare({
+          url,
+          isRetry: true,
+        });
+      });
   };
 }
 
