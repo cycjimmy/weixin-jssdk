@@ -32,7 +32,7 @@ $ yarn add weixinjssdk
 ```javascript
 const WxJssdk = require('weixinjssdk');
 
-let wxJssdk = new WxJssdk()
+const wxJssdk = new WxJssdk()
   .setWxConfig({
     appid: 'your appid',
     secret: 'your secret',

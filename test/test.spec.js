@@ -1,17 +1,14 @@
-let
-  WxJssdk = require('../dist')
-;
+const WxJssdk = require('../dist');
 
 describe('spec', () => {
   test('is running?', () => {
-    const
-      params = {
-        appid: 'wxcc6445076f2002c3',
-        secret: 'd4624c36b6795d1d99dcf0547af5443d',
-        url: 'https://aaa.cc/bbb?d=1&e=2#fortest'
-      };
+    const params = {
+      appid: 'wxb02457e1f23b6db2',
+      secret: '1b0bf9d7a2ffdbce126dd6bea370bf40',
+      url: 'https://aaa.cc/bbb?d=1&e=2#fortest'
+    };
 
-    const wxJssdk = new WxJssdk()
+    new WxJssdk()
       .setWxConfig({
         appid: params.appid,
         secret: params.secret,

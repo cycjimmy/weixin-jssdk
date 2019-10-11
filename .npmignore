@@ -9,8 +9,11 @@
 test
 .travis.yml
 
+# node
+yarn.lock
+yarn-error.log
+
 # project
 server
 src
-yarn.lock
 

@@ -11,10 +11,10 @@ app.get('/api', (req, res) => {
   res.send('mock api');
 });
 
-let wxJssdk = new WxJssdk()
+const wxJssdk = new WxJssdk()
   .setWxConfig({
-    appid: 'wxb36bf3640a94c61d',
-    secret: '3a5e7056cc718ebdf72b41a5e2a88d3e',
+    appid: 'wxb02457e1f23b6db2',
+    secret: '1b0bf9d7a2ffdbce126dd6bea370bf40',
   })
   .setHook();
 
