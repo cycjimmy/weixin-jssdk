@@ -7,30 +7,30 @@
 [![npm download][download-image]][download-url]
 [![npm license][license-image]][download-url]
 
-[npm-image]: https://img.shields.io/npm/v/weixinjssdk.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/weixinjssdk
-[travis-image]: https://img.shields.io/travis/cycdpo/weixinjssdk.svg?style=flat-square
-[travis-url]: https://travis-ci.org/cycdpo/weixinjssdk
-[david-image]: https://img.shields.io/david/cycdpo/weixinjssdk.svg?style=flat-square
-[david-url]: https://david-dm.org/cycdpo/weixinjssdk
-[david-dev-image]: https://david-dm.org/cycdpo/weixinjssdk/dev-status.svg?style=flat-square
-[david-dev-url]: https://david-dm.org/cycdpo/weixinjssdk?type=dev
-[download-image]: https://img.shields.io/npm/dm/weixinjssdk.svg?style=flat-square
-[download-url]: https://npmjs.org/package/weixinjssdk
-[license-image]: https://img.shields.io/npm/l/weixinjssdk.svg?style=flat-square
+[npm-image]: https://img.shields.io/npm/v/@cycjimmy/weixin-jssdk.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/@cycjimmy/weixin-jssdk
+[travis-image]: https://img.shields.io/travis/cycjimmy/weixin-jssdk.svg?style=flat-square
+[travis-url]: https://travis-ci.org/cycjimmy/weixin-jssdk
+[david-image]: https://img.shields.io/david/cycjimmy/weixin-jssdk.svg?style=flat-square
+[david-url]: https://david-dm.org/cycjimmy/weixin-jssdk
+[david-dev-image]: https://david-dm.org/cycjimmy/weixin-jssdk/dev-status.svg?style=flat-square
+[david-dev-url]: https://david-dm.org/cycjimmy/weixin-jssdk?type=dev
+[download-image]: https://img.shields.io/npm/dm/@cycjimmy/weixin-jssdk.svg?style=flat-square
+[download-url]: https://npmjs.org/package/@cycjimmy/weixin-jssdk
+[license-image]: https://img.shields.io/npm/l/@cycjimmy/weixin-jssdk.svg?style=flat-square
 
 ## Install
 ```shell
 # via npm
-$ npm install weixinjssdk --save
+$ npm install @cycjimmy/weixin-jssdk --save
 
 # or via yarn
-$ yarn add weixinjssdk
+$ yarn add @cycjimmy/weixin-jssdk
 ```
 
 ## Use
 ```javascript
-const WxJssdk = require('weixinjssdk');
+const WxJssdk = require('@cycjimmy/weixin-jssdk');
 
 const wxJssdk = new WxJssdk()
   .setWxConfig({
