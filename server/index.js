@@ -19,6 +19,7 @@ const wxJssdk = new WxJssdk()
   .setHook();
 
 app.get('/api/wxJssdk', (req, res) => {
+  // res.send(wxJssdk.tools.getUrl(req));
   wxJssdk.wxshare({
     url: wxJssdk.tools.getUrl(req)
   })

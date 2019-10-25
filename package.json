@@ -32,10 +32,17 @@
     "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
+    "@cycjimmy/config-lib": "^1.2.0",
     "babel-jest": "^24.9.0",
+    "cz-conventional-changelog": "^3.0.2",
     "express": "^4.17.1",
     "jest": "^24.9.0",
-    "nodemon": "^1.19.3",
+    "nodemon": "^1.19.4",
     "trash-cli": "^3.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
